@@ -123,7 +123,7 @@ const Statistics = () => {
 
       <Grid container spacing={3}>
         {/* NAPTÁR SZEKCIÓ - Bal oldal (vagy fenti mobilon) */}
-        <Grid item xs={20} md={10}>
+        <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 2, display: 'flex', justifyContent: 'center', height: '100%' }}>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="hu">
               <DateCalendar
@@ -142,7 +142,7 @@ const Statistics = () => {
         </Grid>
 
         {/* GRAFIKON SZEKCIÓ - Jobb oldal */}
-        <Grid item xs={20} md={10}>
+        <Grid item xs={12} md={6}>
           <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
             <Typography variant="h6" gutterBottom>
               Fejlődés követése
