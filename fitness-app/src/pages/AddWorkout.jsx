@@ -1,194 +1,249 @@
 import React, { useState } from 'react';
 import { useWorkouts } from '../context/WorkoutContext';
-import { useNavigate } from 'react-router-dom'; // Navigációhoz kell
+import { useNavigate } from 'react-router-dom';
 import { 
   Container, TextField, Button, Typography, Box, 
-  Paper, IconButton, Divider, Grid 
+  Paper, IconButton, Grid, Card, CardContent, Divider 
 } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import SaveIcon from '@mui/icons-material/Save';
-import { v4 as uuidv4 } from 'uuid'; // Egyedi ID a gyakorlatoknak
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
+import { v4 as uuidv4 } from 'uuid';
 
 const AddWorkout = () => {
   const { addWorkout } = useWorkouts();
   const navigate = useNavigate();
 
-  // Űrlap állapotok
-  const [date, setDate] = useState(new Date().toISOString().split('T')[0]); // Mai dátum alapból
-  const [name, setName] = useState('');
-  
-  // Dinamikus gyakorlat lista állapota
-  const [exercises, setExercises] = useState([
-    { id: uuidv4(), name: '', sets: '', reps: '', weight: '' } // Egy üres sorral indulunk
-  ]);
+  // 1. ÁLLAPOT: Setup (Név és Dátum megadása)
+  const [isStarted, setIsStarted] = useState(false);
+  const [workoutMeta, setWorkoutMeta] = useState({
+    name: '',
+    date: new Date().toISOString().split('T')[0]
+  });
 
-  /**
-   * Új gyakorlat sor hozzáadása
-   */
-  const handleAddExerciseRow = () => {
+  // 2. ÁLLAPOT: Edzés közben (Gyakorlatok és Szettek)
+  // Struktúra: [{ id, name, sets: [{ id, weight, reps }] }]
+  const [exercises, setExercises] = useState([]);
+
+  // --- KEZELŐ FÜGGVÉNYEK ---
+
+  const handleStartWorkout = (e) => {
+    e.preventDefault();
+    if (workoutMeta.name.trim()) {
+      setIsStarted(true);
+    } else {
+      alert("Adj nevet az edzésnek!");
+    }
+  };
+
+  // Új gyakorlat hozzáadása (pl. Fekvenyomás)
+  const handleAddExercise = () => {
     setExercises([
       ...exercises,
-      { id: uuidv4(), name: '', sets: '', reps: '', weight: '' }
+      { id: uuidv4(), name: '', sets: [] }
     ]);
   };
 
-  /**
-   * Gyakorlat törlése a listából
-   */
-  const handleRemoveExerciseRow = (id) => {
-    if (exercises.length > 1) {
-      setExercises(exercises.filter(ex => ex.id !== id));
-    }
+  // Gyakorlat nevének módosítása
+  const handleExerciseNameChange = (id, newName) => {
+    setExercises(exercises.map(ex => ex.id === id ? { ...ex, name: newName } : ex));
   };
 
-  /**
-   * Input mező változásának kezelése a dinamikus listában
-   */
-  const handleExerciseChange = (id, field, value) => {
-    const updatedExercises = exercises.map((ex) => 
-      ex.id === id ? { ...ex, [field]: value } : ex
-    );
-    setExercises(updatedExercises);
+  // Gyakorlat törlése
+  const handleDeleteExercise = (id) => {
+    setExercises(exercises.filter(ex => ex.id !== id));
   };
 
-  /**
-   * Mentés gomb kezelése
-   */
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    // Validáció: csak akkor mentünk, ha van név
-    if (!name.trim()) {
-      alert("Kérlek adj meg egy nevet az edzésnek!");
+  // Új SZETT hozzáadása egy konkrét gyakorlathoz
+  const handleAddSet = (exerciseId) => {
+    setExercises(exercises.map(ex => {
+      if (ex.id === exerciseId) {
+        return {
+          ...ex,
+          sets: [...ex.sets, { id: uuidv4(), weight: '', reps: '' }]
+        };
+      }
+      return ex;
+    }));
+  };
+
+  // Szett adatainak módosítása (súly vagy ismétlés)
+  const handleSetChange = (exerciseId, setId, field, value) => {
+    setExercises(exercises.map(ex => {
+      if (ex.id === exerciseId) {
+        const updatedSets = ex.sets.map(set => 
+          set.id === setId ? { ...set, [field]: value } : set
+        );
+        return { ...ex, sets: updatedSets };
+      }
+      return ex;
+    }));
+  };
+
+  // Szett törlése
+  const handleDeleteSet = (exerciseId, setId) => {
+    setExercises(exercises.map(ex => {
+      if (ex.id === exerciseId) {
+        return { ...ex, sets: ex.sets.filter(set => set.id !== setId) };
+      }
+      return ex;
+    }));
+  };
+
+  // VÉGSŐ MENTÉS
+  const handleSaveWorkout = () => {
+    // Csak azokat a gyakorlatokat mentjük, amiknek van neve és legalább 1 szettje
+    const validExercises = exercises.filter(ex => ex.name.trim() !== '' && ex.sets.length > 0);
+    
+    if (validExercises.length === 0) {
+      alert("Rögzíts legalább egy gyakorlatot és egy szettet!");
       return;
     }
 
-    // Összeállítjuk az adatobjektumot
-    const workoutData = {
-      name,
-      date,
-      exercises: exercises.filter(ex => ex.name.trim() !== '') // Üres nevűeket kiszűrjük
+    const finalData = {
+      ...workoutMeta,
+      exercises: validExercises
     };
 
-    // Mentés a Context-be
-    addWorkout(workoutData);
-
-    // Visszaugrás a főoldalra
+    addWorkout(finalData);
     navigate('/');
   };
 
+  // --- MEGJELENÍTÉS ---
+
+  // 1. Nézet: SETUP
+  if (!isStarted) {
+    return (
+      <Container maxWidth="sm" sx={{ mt: 8 }}>
+        <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
+          <FitnessCenterIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
+          <Typography variant="h4" gutterBottom>Új Edzés</Typography>
+          <Typography variant="body2" color="textSecondary" mb={4}>
+            Add meg az alap adatokat az induláshoz
+          </Typography>
+          
+          <Box component="form" onSubmit={handleStartWorkout}>
+            <TextField
+              label="Edzés neve"
+              fullWidth
+              required
+              value={workoutMeta.name}
+              onChange={(e) => setWorkoutMeta({...workoutMeta, name: e.target.value})}
+              sx={{ mb: 3 }}
+              placeholder="pl. Mell-Hát"
+            />
+            <TextField
+              label="Dátum"
+              type="date"
+              fullWidth
+              required
+              value={workoutMeta.date}
+              onChange={(e) => setWorkoutMeta({...workoutMeta, date: e.target.value})}
+              sx={{ mb: 4 }}
+            />
+            <Button 
+              type="submit" 
+              variant="contained" 
+              size="large" 
+              fullWidth
+              startIcon={<PlayArrowIcon />}
+            >
+              Indítás
+            </Button>
+          </Box>
+        </Paper>
+      </Container>
+    );
+  }
+
+  // 2. Nézet: EDZÉS RÖGZÍTÉSE
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>
-        Új edzés rögzítése
-      </Typography>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <div>
+          <Typography variant="h4">{workoutMeta.name}</Typography>
+          <Typography variant="subtitle1" color="textSecondary">{workoutMeta.date}</Typography>
+        </div>
+        <Button variant="contained" color="success" startIcon={<SaveIcon />} onClick={handleSaveWorkout}>
+          Edzés Mentése
+        </Button>
+      </Box>
 
-      <form onSubmit={handleSubmit}>
-        <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
-          <Grid container spacing={2}>
-            <Grid item xs={12} sm={8}>
-              <TextField
-                label="Edzés neve (pl. Mell-Bicepsz)"
+      {exercises.map((exercise, index) => (
+        <Card key={exercise.id} sx={{ mb: 3, position: 'relative' }}>
+          <CardContent>
+            {/* Gyakorlat Fejléc */}
+            <Box display="flex" alignItems="center" mb={2}>
+              <Typography variant="h6" sx={{ mr: 2, width: '30px' }}>#{index + 1}</Typography>
+              <TextField 
+                variant="standard" 
+                placeholder="Gyakorlat neve (pl. Guggolás)"
                 fullWidth
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
+                value={exercise.name}
+                onChange={(e) => handleExerciseNameChange(exercise.id, e.target.value)}
+                InputProps={{ style: { fontSize: '1.2rem', fontWeight: 500 } }}
               />
-            </Grid>
-            <Grid item xs={12} sm={4}>
-              <TextField
-                label="Dátum"
-                type="date"
-                fullWidth
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                InputLabelProps={{ shrink: true }}
-                required
-              />
-            </Grid>
-          </Grid>
-        </Paper>
-
-        <Typography variant="h6" gutterBottom>
-          Gyakorlatok
-        </Typography>
-
-        {exercises.map((exercise, index) => (
-          <Paper key={exercise.id} sx={{ p: 2, mb: 2, position: 'relative' }}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-              <Typography variant="subtitle1" color="primary">
-                {index + 1}. Gyakorlat
-              </Typography>
-              <IconButton 
-                color="error" 
-                onClick={() => handleRemoveExerciseRow(exercise.id)}
-                disabled={exercises.length === 1} // Az utolsót ne lehessen törölni
-              >
+              <IconButton color="error" onClick={() => handleDeleteExercise(exercise.id)}>
                 <DeleteIcon />
               </IconButton>
             </Box>
-            
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6}>
-                <TextField
-                  label="Gyakorlat neve"
-                  fullWidth
-                  value={exercise.name}
-                  onChange={(e) => handleExerciseChange(exercise.id, 'name', e.target.value)}
-                  placeholder="pl. Fekvenyomás"
-                />
-              </Grid>
-              <Grid item xs={4} sm={2}>
-                <TextField
-                  label="Szériák"
-                  type="number"
-                  fullWidth
-                  value={exercise.sets}
-                  onChange={(e) => handleExerciseChange(exercise.id, 'sets', e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={4} sm={2}>
-                <TextField
-                  label="Ismétlés"
-                  type="number"
-                  fullWidth
-                  value={exercise.reps}
-                  onChange={(e) => handleExerciseChange(exercise.id, 'reps', e.target.value)}
-                />
-              </Grid>
-              <Grid item xs={4} sm={2}>
+
+            <Divider sx={{ mb: 2 }} />
+
+            {/* Szettek listája */}
+            {exercise.sets.map((set, setIndex) => (
+              <Box key={set.id} display="flex" alignItems="center" mb={1} sx={{ gap: 2 }}>
+                <Typography variant="body2" sx={{ minWidth: '60px', color: 'text.secondary' }}>
+                  {setIndex + 1}. szett
+                </Typography>
+                
                 <TextField
                   label="Súly (kg)"
                   type="number"
-                  fullWidth
-                  value={exercise.weight}
-                  onChange={(e) => handleExerciseChange(exercise.id, 'weight', e.target.value)}
+                  size="small"
+                  sx={{ width: '150px' }}
+                  value={set.weight}
+                  onChange={(e) => handleSetChange(exercise.id, set.id, 'weight', e.target.value)}
                 />
-              </Grid>
-            </Grid>
-          </Paper>
-        ))}
+                <TextField
+                  label="Ismétlés"
+                  type="number"
+                  size="small"
+                  sx={{ width: '150px' }}
+                  value={set.reps}
+                  onChange={(e) => handleSetChange(exercise.id, set.id, 'reps', e.target.value)}
+                />
 
-        <Box display="flex" justifyContent="space-between" mt={3}>
-          <Button 
-            variant="outlined" 
-            startIcon={<AddCircleOutlineIcon />} 
-            onClick={handleAddExerciseRow}
-          >
-            Új gyakorlat
-          </Button>
-          
-          <Button 
-            variant="contained" 
-            color="primary" 
-            size="large"
-            type="submit"
-            startIcon={<SaveIcon />}
-          >
-            Mentés
-          </Button>
-        </Box>
-      </form>
+                <IconButton size="small" onClick={() => handleDeleteSet(exercise.id, set.id)}>
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            ))}
+
+            <Button 
+              size="small" 
+              startIcon={<AddCircleOutlineIcon />} 
+              onClick={() => handleAddSet(exercise.id)}
+              sx={{ mt: 1 }}
+            >
+              Szett hozzáadása
+            </Button>
+          </CardContent>
+        </Card>
+      ))}
+
+      <Button 
+        variant="outlined" 
+        fullWidth 
+        size="large" 
+        startIcon={<AddCircleOutlineIcon />} 
+        onClick={handleAddExercise}
+        sx={{ borderStyle: 'dashed', height: '60px' }}
+      >
+        Új Gyakorlat Felvétele
+      </Button>
     </Container>
   );
 };
