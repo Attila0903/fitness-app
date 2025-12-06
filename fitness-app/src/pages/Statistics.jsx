@@ -84,7 +84,7 @@ const Statistics = () => {
   }, [workouts]);
 
   return (
-    <Container maxWidth="md" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
       <Typography variant="h4" component="h1" gutterBottom>
         Statisztika
       </Typography>
@@ -123,7 +123,7 @@ const Statistics = () => {
 
       <Grid container spacing={3}>
         {/* NAPTÁR SZEKCIÓ - Bal oldal (vagy fenti mobilon) */}
-        <Grid item xs={12} md={6}>
+        <Grid item xs={12} md={8}>
           <Paper elevation={3} sx={{ p: 2, display: 'flex', justifyContent: 'center', height: '100%' }}>
             <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="hu">
               <DateCalendar
@@ -142,8 +142,8 @@ const Statistics = () => {
         </Grid>
 
         {/* GRAFIKON SZEKCIÓ - Jobb oldal */}
-        <Grid item xs={12} md={6}>
-          <Paper elevation={3} sx={{ p: 3, height: '100%' }}>
+        <Grid item xs={12} md={8}>
+          <Paper elevation={3} sx={{ p: 3, height: '100%'}}>
             <Typography variant="h6" gutterBottom>
               Fejlődés követése
             </Typography>
