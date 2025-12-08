@@ -4,25 +4,29 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import AddWorkout from './pages/AddWorkout';
 import Statistics from './pages/Statistics';
-
-// Material UI téma reset (opcionális, de szebb tőle)
-import { CssBaseline } from '@mui/material';
+import Footer from './components/Footer'; // ÚJ IMPORT
+import { CssBaseline, Box } from '@mui/material';
 
 function App() {
   return (
     <BrowserRouter>
-      {/* CssBaseline normalizálja a böngésző stílusokat */}
       <CssBaseline />
       
-      {/* A Navbar mindig látszik */}
-      <Navbar />
+      {/* Flexbox layout, hogy a Footer mindig legalul legyen */}
+      <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        <Navbar />
 
-      {/* Itt cserélődnek az oldalak az URL alapján */}
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/add" element={<AddWorkout />} />
-        <Route path="/stats" element={<Statistics />} />
-      </Routes>
+        {/* A tartalomnak adunk "flex-grow"-t, hogy kitöltse a helyet */}
+        <Box component="main" sx={{ flexGrow: 1 }}>
+          <Routes>
+            <Route path="/" element={<Home />} />
+            <Route path="/add" element={<AddWorkout />} />
+            <Route path="/stats" element={<Statistics />} />
+          </Routes>
+        </Box>
+
+        <Footer /> {/* ITT A LÁBLÉC */}
+      </Box>
     </BrowserRouter>
   );
 }

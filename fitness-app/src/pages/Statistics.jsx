@@ -1,40 +1,20 @@
-import React, { useState, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useWorkouts } from '../context/WorkoutContext';
-import { 
-  Container, Typography, Box, Paper, FormControl, InputLabel, Select, MenuItem, Card, CardContent 
-} from '@mui/material';
+import { Container, Typography, Box } from '@mui/material';
 import Grid from '@mui/material/Grid2';
-import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend 
-} from 'recharts';
 import EventAvailableIcon from '@mui/icons-material/EventAvailable';
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import { DateCalendar } from '@mui/x-date-pickers/DateCalendar';
-import { PickersDay } from '@mui/x-date-pickers/PickersDay';
-import Badge from '@mui/material/Badge';
-import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 
-function WorkoutDay(props) {
-  const { highlightedDays = [], day, outsideCurrentMonth, ...other } = props;
-  const isSelected = !props.outsideCurrentMonth && highlightedDays.includes(day.format('YYYY-MM-DD'));
-
-  return (
-    <Badge
-      key={props.day.toString()}
-      overlap="circular"
-      badgeContent={isSelected ? <FitnessCenterIcon sx={{ fontSize: 12, color: 'white' }} /> : undefined}
-      color="success"
-      anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
-    >
-      <PickersDay {...other} outsideCurrentMonth={outsideCurrentMonth} day={day} />
-    </Badge>
-  );
-}
+import SummaryCard from '../components/SummaryCard';
+import WorkoutCalendar from '../components/WorkoutCalendar';
+import ProgressChart from '../components/ProgressChart';
+import ShareButton from '../components/ShareButton';
 
 const Statistics = () => {
   const { workouts } = useWorkouts();
   const [selectedExercise, setSelectedExercise] = useState('');
 
+  // 1. Gyakorlatnevek kigyűjtése
   const uniqueExerciseNames = useMemo(() => {
     const names = new Set();
     workouts.forEach(workout => {
@@ -45,6 +25,7 @@ const Statistics = () => {
     return Array.from(names).sort();
   }, [workouts]);
 
+  // 2. Grafikon adat (és rekord) kiszámolása
   const chartData = useMemo(() => {
     if (!selectedExercise) return [];
     const data = [];
@@ -62,7 +43,15 @@ const Statistics = () => {
     return data;
   }, [workouts, selectedExercise]);
 
-  const workoutDates = useMemo(() => workouts.map(w => w.date), [workouts]);
+  // 3. Rekord kiszámítása
+  const personalRecord = useMemo(() => {
+    if (chartData.length === 0) return 0;
+    return Math.max(...chartData.map(d => d.weight));
+  }, [chartData]);
+
+  // 4. MÓDOSÍTÁS: Egyszerűsített szöveg (csak a rekordról szól)
+  const shareText = `A mai statisztikám: ${selectedExercise} gyakorlatban az egyéni rekordom ${personalRecord}kg! 💪 #FitnessApp`;
+  const shareTitle = `Új rekord: ${selectedExercise}`;
 
   return (
     <Container maxWidth="xl" sx={{ py: 4 }}>
@@ -70,84 +59,54 @@ const Statistics = () => {
         Statisztika
       </Typography>
 
-      {/* MODERN GRID HASZNÁLAT (Grid2) */}
+      {/* Felső kártyák */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
-        {/* size={{ xs: 12, md: 6 }} a régi xs={12} md={6} helyett */}
         <Grid size={{ xs: 12, md: 6 }}>
-          <Card sx={{ bgcolor: 'primary.light', color: 'white' }}>
-            <CardContent>
-              <Box display="flex" alignItems="center" gap={1}>
-                <EventAvailableIcon />
-                <Typography variant="h6">Összes edzés</Typography>
-              </Box>
-              <Typography variant="h3" fontWeight="bold">{workouts.length}</Typography>
-            </CardContent>
-          </Card>
+          <SummaryCard 
+            icon={EventAvailableIcon}
+            title="Összes edzés"
+            value={workouts.length}
+            color="primary"
+          />
         </Grid>
         <Grid size={{ xs: 12, md: 6 }}>
-          <Card sx={{ bgcolor: 'secondary.light', color: 'white' }}>
-            <CardContent>
-              <Box display="flex" alignItems="center" gap={1}>
-                <TrendingUpIcon />
-                <Typography variant="h6">Gyakorlatok</Typography>
-              </Box>
-              <Typography variant="h3" fontWeight="bold">{uniqueExerciseNames.length}</Typography>
-            </CardContent>
-          </Card>
+          <SummaryCard 
+            icon={TrendingUpIcon}
+            title="Gyakorlatok"
+            value={uniqueExerciseNames.length}
+            subtitle="különböző típus"
+            color="secondary"
+          />
         </Grid>
       </Grid>
+      
+      {/* MÓDOSÍTÁS: Feltételes megjelenítés 
+         A "selectedExercise &&" azt jelenti: Csak akkor jelenjen meg ez a blokk,
+         ha VAN kiválasztott gyakorlat.
+      */}
+      {selectedExercise && (
+        <Box sx={{ display: 'flex', justifyContent: 'end', mb: 2 }}>
+          <ShareButton 
+            title={shareTitle}
+            text={shareText} 
+          />
+        </Box>
+      )}
 
       <Grid container spacing={3}>
-        {/* NAPTÁR: Keskenyebb (md: 4 egység) */}
+        {/* Naptár */}
         <Grid size={{ xs: 12, md: 4, lg: 3 }}>
-          <Paper elevation={3} sx={{ p: 2, display: 'flex', justifyContent: 'center', height: '100%' }}>
-            <DateCalendar
-              readOnly
-              slots={{ day: WorkoutDay }}
-              slotProps={{ day: { highlightedDays: workoutDates } }}
-            />
-          </Paper>
+          <WorkoutCalendar workouts={workouts} />
         </Grid>
 
-        {/* GRAFIKON: Szélesebb (md: 8 egység) */}
+        {/* Grafikon */}
         <Grid size={{ xs: 12, md: 8, lg: 9 }}>
-          <Paper elevation={3} sx={{ p: 3, height: '100%', minHeight: 400 }}>
-            <Typography variant="h6" gutterBottom>Fejlődés követése</Typography>
-            
-            <Box sx={{ mb: 3, maxWidth: 300 }}>
-              <FormControl fullWidth size="small">
-                <InputLabel>Válassz gyakorlatot</InputLabel>
-                <Select
-                  value={selectedExercise}
-                  label="Válassz gyakorlatot"
-                  onChange={(e) => setSelectedExercise(e.target.value)}
-                >
-                  {uniqueExerciseNames.map((name) => (
-                    <MenuItem key={name} value={name}>{name}</MenuItem>
-                  ))}
-                </Select>
-              </FormControl>
-            </Box>
-
-            <Box sx={{ width: '100%', height: 350 }}>
-              {selectedExercise ? (
-                <ResponsiveContainer>
-                  <LineChart data={chartData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="date" />
-                    <YAxis unit="kg" />
-                    <Tooltip />
-                    <Legend />
-                    <Line type="monotone" dataKey="weight" stroke="#8884d8" name="Max Súly" activeDot={{ r: 8 }} strokeWidth={2} />
-                  </LineChart>
-                </ResponsiveContainer>
-              ) : (
-                <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-                  <Typography color="textSecondary">Válassz gyakorlatot!</Typography>
-                </Box>
-              )}
-            </Box>
-          </Paper>
+          <ProgressChart 
+            uniqueExerciseNames={uniqueExerciseNames}
+            selectedExercise={selectedExercise}
+            onExerciseChange={setSelectedExercise}
+            chartData={chartData}
+          />
         </Grid>
       </Grid>
     </Container>
