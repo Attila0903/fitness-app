@@ -17,7 +17,9 @@ const SetRow = ({ set, index, onChange, onDelete }) => {
         value={set.weight}
         onChange={(e) => onChange(set.id, 'weight', e.target.value)}
         placeholder="0"
-        InputLabelProps={{ shrink: true }}
+        slotProps={{
+          input:{ shrink: true }
+        }}
       />
       <TextField
         label="Ismétlés"
@@ -27,7 +29,9 @@ const SetRow = ({ set, index, onChange, onDelete }) => {
         value={set.reps}
         onChange={(e) => onChange(set.id, 'reps', e.target.value)}
         placeholder="0"
-        InputLabelProps={{ shrink: true }}
+        slotProps={{
+          input:{ shrink: true }
+        }}
       />
 
       <IconButton size="small" onClick={() => onDelete(set.id)}>

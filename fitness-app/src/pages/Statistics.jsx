@@ -49,8 +49,8 @@ const Statistics = () => {
     return Math.max(...chartData.map(d => d.weight));
   }, [chartData]);
 
-  // 4. MÓDOSÍTÁS: Egyszerűsített szöveg (csak a rekordról szól)
-  const shareText = `A mai statisztikám: ${selectedExercise} gyakorlatban az egyéni rekordom ${personalRecord}kg! 💪 #FitnessApp`;
+  
+  const shareText = `${selectedExercise} gyakorlatban az egyéni rekordom ${personalRecord}kg!`;
   const shareTitle = `Új rekord: ${selectedExercise}`;
 
   return (
@@ -80,8 +80,8 @@ const Statistics = () => {
         </Grid>
       </Grid>
       
-      {/* MÓDOSÍTÁS: Feltételes megjelenítés 
-         A "selectedExercise &&" azt jelenti: Csak akkor jelenjen meg ez a blokk,
+      {/*
+         Csak akkor jelenjen meg ez a blokk,
          ha VAN kiválasztott gyakorlat.
       */}
       {selectedExercise && (

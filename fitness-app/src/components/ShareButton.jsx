@@ -7,7 +7,7 @@ const ShareButton = ({ title, text }) => {
   const [open, setOpen] = useState(false);
 
   const handleShare = async () => {
-    // 2. JS API HASZNÁLATA: Web Share API
+    // JS API HASZNÁLATA: Web Share API
     if (navigator.share) {
       try {
         await navigator.share({

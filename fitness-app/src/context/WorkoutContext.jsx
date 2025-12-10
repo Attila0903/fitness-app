@@ -5,11 +5,8 @@ const WorkoutContext = createContext();
 
 /**
  * A WorkoutProvider komponens felelős az edzésadatok kezeléséért.
- * Javított verzió: Lazy Initialization használata a localStorage-hoz.
  */
 export const WorkoutProvider = ({ children }) => {
-  // JAVÍTÁS: Nem useEffect-ben töltünk be, hanem közvetlenül az állapot létrehozásakor.
-  // Ez a függvény csak egyszer fut le, az oldal betöltésekor.
   const [workouts, setWorkouts] = useState(() => {
     try {
       const storedWorkouts = localStorage.getItem('fitness-app-data');
