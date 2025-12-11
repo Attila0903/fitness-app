@@ -14,9 +14,10 @@ function App() {
       
       {/* Flexbox layout, hogy a Footer mindig legalul legyen */}
       <Box sx={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
+        {/*Navigációs sáv*/}
         <Navbar />
 
-        {/* A tartalomnak adunk "flex-grow"-t, hogy kitöltse a helyet */}
+        {/* A tartalomnak flex-grow, hogy kitöltse a helyet */}
         <Box component="main" sx={{ flexGrow: 1 }}>
           <Routes>
             <Route path="/" element={<Home />} />
@@ -25,7 +26,8 @@ function App() {
           </Routes>
         </Box>
 
-        <Footer /> {/* ITT A LÁBLÉC */}
+        {/*Lábléc*/}
+        <Footer /> 
       </Box>
     </BrowserRouter>
   );

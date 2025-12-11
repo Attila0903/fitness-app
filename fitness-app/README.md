@@ -1,16 +1,16 @@
-# React + Vite
+Fitness App
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Az alkalmazás célja egy személy edzéseinek nyilvántartása, fejlődésének nyomon követése.
 
-Currently, two official plugins are available:
+Napló:
+Itt tároljuk az edzéseinket, mindegyikhez tartozik egy név, dátum, valamint hogy milyen gyakorlatokat végeztünk, milyen szettek tartoznak hozzájuk.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Edzés hozzáadása:
+Az ÚJ EDZÉS fülön új edzést indíthatunk, megadhatjuk a nevét (pl. Láb), valamint az edzés dátumát.
+Az edzéshez hozzáadhatunk gyakorlatokat, a gyakorlatokon belül szériákat, amikhez megadhatjuk azt, hogy mekkora súllyal végeztük és hány ismétlést csináltunk belőle. Az elmentett edzés bekerül a naplóba.
 
-## React Compiler
-
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
-
-## Expanding the ESLint configuration
-
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Statisztika:
+Az alábbi dolgokat nézhetjük meg ezen a felületen:
+-Eddigi edzésein száma
+-Különböző gyakorlatok száma
+-Egy gyakorlatot kiválasztva a fejlődésünket a súly tekintetében
