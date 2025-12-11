@@ -22,7 +22,7 @@ const Home = () => {
         Korábbi Edzések
       </Typography>
 
-      {/* Feltételes renderelés: Üres lista vs. Tartalom */}
+      {/* Feltételes renderelés: Üres lista vagy Tartalom */}
       {workouts.length === 0 ? (
         <Typography variant="body1" color="textSecondary">
           Még nincs rögzített edzésed. Kattints az "Új edzés" gombra!
