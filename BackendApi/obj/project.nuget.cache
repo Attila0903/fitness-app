@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "tqxsGR259VQ=",
+  "dgSpecHash": "VvubEXhFMYM=",
   "success": true,
-  "projectFilePath": "c:\\Egyetem\\Kliensoldali\\Fitness App\\BackendApi\\BackendApi.csproj",
+  "projectFilePath": "C:\\Egyetem\\Kliensoldali\\Fitness App\\BackendApi\\BackendApi.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\Attila\\.nuget\\packages\\azure.core\\1.47.1\\azure.core.1.47.1.nupkg.sha512",
     "C:\\Users\\Attila\\.nuget\\packages\\azure.identity\\1.14.2\\azure.identity.1.14.2.nupkg.sha512",

@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "c:\\Egyetem\\Kliensoldali\\Fitness App\\BackendApi\\BackendApi.csproj": {}
+    "C:\\Egyetem\\Kliensoldali\\Fitness App\\BackendApi\\BackendApi.csproj": {}
   },
   "projects": {
-    "c:\\Egyetem\\Kliensoldali\\Fitness App\\BackendApi\\BackendApi.csproj": {
+    "C:\\Egyetem\\Kliensoldali\\Fitness App\\BackendApi\\BackendApi.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "c:\\Egyetem\\Kliensoldali\\Fitness App\\BackendApi\\BackendApi.csproj",
+        "projectUniqueName": "C:\\Egyetem\\Kliensoldali\\Fitness App\\BackendApi\\BackendApi.csproj",
         "projectName": "BackendApi",
-        "projectPath": "c:\\Egyetem\\Kliensoldali\\Fitness App\\BackendApi\\BackendApi.csproj",
+        "projectPath": "C:\\Egyetem\\Kliensoldali\\Fitness App\\BackendApi\\BackendApi.csproj",
         "packagesPath": "C:\\Users\\Attila\\.nuget\\packages\\",
-        "outputPath": "c:\\Egyetem\\Kliensoldali\\Fitness App\\BackendApi\\obj\\",
+        "outputPath": "C:\\Egyetem\\Kliensoldali\\Fitness App\\BackendApi\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"

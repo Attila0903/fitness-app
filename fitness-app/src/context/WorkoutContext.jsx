@@ -30,8 +30,7 @@ export const WorkoutProvider = ({ children }) => {
   const addWorkout = (workoutData) => {
     const newWorkout = {
       id: uuidv4(),
-      date: new Date().toISOString().split('T')[0],
-      timestamp: Date.now(),
+      date: new Date().toISOString().split('T')[0],      
       ...workoutData
     };
     setWorkouts((prevWorkouts) => [newWorkout, ...prevWorkouts]);
