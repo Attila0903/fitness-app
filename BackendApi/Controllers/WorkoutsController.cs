@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 [Route("api/[controller]")]
 [ApiController]
@@ -13,9 +14,9 @@ public class WorkoutController : ControllerBase
     } 
 
     [HttpGet]
-    public IEnumerable<Workout> GetWorkouts()
+    public async Task<ActionResult<IEnumerable<Workout>>> GetWorkouts()
     {        
-        return _context.Workouts.ToList();        
+        return Ok(_context.Workouts.Include(w => w.Exercises).ThenInclude(e => e.Sets).ToListAsync());        
     }
 
     [HttpPost]

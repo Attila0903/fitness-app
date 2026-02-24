@@ -35,6 +35,5 @@ if (app.Environment.IsDevelopment())
 app.MapControllers();
 
 app.UseCors("ReactPolicy"); // CORS bekapcsolása
-//app.UseHttpsRedirection();
 
 app.Run();

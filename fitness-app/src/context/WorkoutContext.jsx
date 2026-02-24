@@ -16,6 +16,7 @@ export const WorkoutProvider = ({ children }) => {
         const response = await fetch('http://localhost:5202/api/workout');
         if(!response.ok) throw new Error('Hiba a szerver elérésekor');
         const data = await response.json();
+        console.log(data)
         setWorkouts(data);
       }catch(error){
         console.error("Hiba:",error);
