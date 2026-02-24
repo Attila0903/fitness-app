@@ -1,7 +1,7 @@
-import React from 'react';
-import { useWorkouts } from '../context/WorkoutContext';
-import { Container, Typography } from '@mui/material';
-import WorkoutCard from '../components/WorkoutCard'; // Az új komponens importálása
+import React from "react";
+import { useWorkouts } from "../context/WorkoutContext";
+import { Container, Typography, CircularProgress } from "@mui/material";
+import WorkoutCard from "../components/WorkoutCard"; // Az új komponens importálása
 
 /**
  * Főoldal (Home) Komponens.
@@ -14,7 +14,26 @@ import WorkoutCard from '../components/WorkoutCard'; // Az új komponens import�
  * 4. Továbbadja a törlés funkciót a kártyáknak.
  */
 const Home = () => {
-  const { workouts, deleteWorkout } = useWorkouts();
+  const { workouts, isLoadingWorkout, deleteWorkout } = useWorkouts();
+
+  const renderWorkoutContent = () => {
+    if (workouts.length === 0) {
+      return (
+        <Typography variant="body1" color="textSecondary">
+          Még nincs rögzített edzésed. Kattints az "Új edzés" gombra!
+        </Typography>
+      );
+    }
+
+    return workouts.map((workout) => (
+      <WorkoutCard
+        /* Lista renderelése: Minden edzéshez egy kártyát hozunk létre */
+        key={workout.id}
+        workout={workout}
+        onDelete={deleteWorkout}
+      />
+    ));
+  };
 
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
@@ -22,20 +41,10 @@ const Home = () => {
         Korábbi Edzések
       </Typography>
 
-      {/* Feltételes renderelés: Üres lista vagy Tartalom */}
-      {workouts.length === 0 ? (
-        <Typography variant="body1" color="textSecondary">
-          Még nincs rögzített edzésed. Kattints az "Új edzés" gombra!
-        </Typography>
+      {isLoadingWorkout ? (
+        <CircularProgress color="primary" size={60} thickness={4} />
       ) : (
-        workouts.map((workout) => (
-          <WorkoutCard 
-          /* Lista renderelése: Minden edzéshez egy kártyát hozunk létre */
-            key={workout.id} 
-            workout={workout} 
-            onDelete={deleteWorkout} 
-          />
-        ))
+        renderWorkoutContent()
       )}
     </Container>
   );

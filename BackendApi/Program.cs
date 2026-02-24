@@ -14,6 +14,8 @@ builder.Services.AddCors( options =>
 }
 );
 
+builder.Services.AddControllers();
+
 builder.Services.AddDbContext<FitnessDbContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
@@ -30,7 +32,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.MapControllers();
+
 app.UseCors("ReactPolicy"); // CORS bekapcsolása
-app.UseHttpsRedirection();
+//app.UseHttpsRedirection();
 
 app.Run();

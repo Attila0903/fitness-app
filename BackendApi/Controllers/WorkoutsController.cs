@@ -1,8 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 
 [Route("api/[controller]")]
 [ApiController]
-public class WorkoutController:ControllerBase
+public class WorkoutController : ControllerBase
 {
     private readonly FitnessDbContext _context;
 
@@ -13,8 +14,8 @@ public class WorkoutController:ControllerBase
 
     [HttpGet]
     public IEnumerable<Workout> GetWorkouts()
-    {
-        return _context.Workouts;
+    {        
+        return _context.Workouts.ToList();        
     }
 
     [HttpPost]
