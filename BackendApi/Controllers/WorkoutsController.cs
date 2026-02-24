@@ -16,7 +16,8 @@ public class WorkoutController : ControllerBase
     [HttpGet]
     public async Task<ActionResult<IEnumerable<Workout>>> GetWorkouts()
     {        
-        return Ok(_context.Workouts.Include(w => w.Exercises).ThenInclude(e => e.Sets).ToListAsync());        
+        var workouts = await _context.Workouts.Include(w => w.Exercises).ThenInclude(e => e.Sets).ToListAsync();
+        return Ok(workouts);        
     }
 
     [HttpPost]
@@ -25,5 +26,22 @@ public class WorkoutController : ControllerBase
         _context.Workouts.Add(workout);
         _context.SaveChanges();
         return Ok(workout);
+    }
+
+    [HttpDelete("{id}")]
+     public async Task<IActionResult> DeleteWorkout([FromRoute]int id)
+    {        
+        var deletedWorkout = await _context.Workouts.Include(w => w.Exercises).ThenInclude(e => e.Sets).FirstOrDefaultAsync();
+
+        if(deletedWorkout == null)
+        {
+            return NotFound();
+        }
+
+        _context.Workouts.Remove(deletedWorkout);
+
+        await _context.SaveChangesAsync();
+
+        return NoContent();
     }
 }

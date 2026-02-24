@@ -63,8 +63,20 @@ export const WorkoutProvider = ({ children }) => {
    * @param {string} id - A törlendő edzés azonosítója
    */
   //API hívás lesz
-  const deleteWorkout = (id) => {
-    setWorkouts((prevWorkouts) => prevWorkouts.filter((workout) => workout.id !== id));
+  const deleteWorkout = async (id) => {
+    try{
+      const response = await fetch("http://localhost:5202/api/workout/" + id, {
+        method: 'DELETE'
+      });
+      if(response.ok){
+        console.log("Sikeres törlés adatbázisból")
+      }else{
+        console.error("Hiba történt a szerveren. Státuszkód:", response.status);
+      }     
+      setWorkouts((prevWorkouts) => prevWorkouts.filter((workout) => workout.id !== id));      
+    }catch(error){
+        console.error("Hiba a törlés során",error)
+    }    
   };
 
   const value = {
