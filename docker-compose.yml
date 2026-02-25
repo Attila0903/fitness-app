@@ -1,0 +1,26 @@
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=Y
+      - MSSQL_SA_PASSWORD=YourStrong!Pass123
+    ports:
+      - "1433:1433"
+
+  backend:
+    build:
+      context: ./BackendApi  # Ez azt mondja, hogy a Docker csak a BackendApi mappát lássa
+      dockerfile: Dockerfile
+    environment:
+      - ConnectionStrings__DefaultConnection=Server=db;Database=FitnessDb;User Id=sa;Password=YourStrong!Pass123;TrustServerCertificate=True
+    depends_on:
+      - db
+    ports:
+      - "5202:8080"
+
+  frontend:
+    build: ./fitness-app
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend

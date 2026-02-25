@@ -13,7 +13,7 @@ export const WorkoutProvider = ({ children }) => {
   {
     const loadWorkouts = async () => {
       try{
-        const response = await fetch('http://localhost:5202/api/workout');
+        const response = await fetch(`/api/workout`);
         if(!response.ok) throw new Error('Hiba a szerver elérésekor');
         const data = await response.json();
         console.log(data)
@@ -44,7 +44,7 @@ export const WorkoutProvider = ({ children }) => {
     }))
   };
     try{
-      const response = await fetch('http://localhost:5202/api/workout',{
+      const response = await fetch(`/api/workout`,{
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify(workoutToSave)
@@ -65,7 +65,7 @@ export const WorkoutProvider = ({ children }) => {
   //API hívás lesz
   const deleteWorkout = async (id) => {
     try{
-      const response = await fetch("http://localhost:5202/api/workout/" + id, {
+      const response = await fetch(`/api/workout/${id}`, {
         method: 'DELETE'
       });
       if(response.ok){
