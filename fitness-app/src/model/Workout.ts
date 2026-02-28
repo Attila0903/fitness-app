@@ -1,0 +1,34 @@
+import { Exercise, IExerciseDto } from "./Exercise";
+
+export interface IWorkoutDto{
+    id ?: number;
+    date : string | Date;
+    name: string;
+    exercises: IExerciseDto[]
+}
+
+export class Workout{
+    id ?: number;
+    date: Date;
+    name: string;
+    exercises: Exercise[];
+
+    constructor(dto: Partial<IWorkoutDto> = {}){
+        this.id = dto.id;
+        this.date = dto.date ? new Date(dto.date) : new Date();
+        this.name = dto.name || '';
+        this.exercises = dto.exercises? dto.exercises.map(e =>new Exercise(e)) : [];
+    }
+
+    dtoFormat(){
+        return {
+            date: `${this.date.getFullYear()}-${String(this.date.getMonth() + 1).padStart(2, '0')}-${String(this.date.getDate()).padStart(2, '0')}`,
+            name:this.name,
+            exercises: this.exercises.map(ex => ex.dtoFormat())
+        }
+    }
+
+    isNameValid(){
+        return this.name.trim().length >= 3;
+    }
+}

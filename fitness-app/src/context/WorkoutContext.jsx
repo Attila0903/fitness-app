@@ -1,4 +1,5 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext } from "react";
+import { Workout } from "./models/Workout";
 
 const WorkoutContext = createContext();
 
@@ -7,55 +8,45 @@ const WorkoutContext = createContext();
  */
 export const WorkoutProvider = ({ children }) => {
   const [workouts, setWorkouts] = useState([]);
-  const [isLoadingWorkout, setIsLoadingWorkout] = useState(true)
+  const [isLoadingWorkout, setIsLoadingWorkout] = useState(true);
 
-  useEffect(()=>
-  {
+  useEffect(() => {
     const loadWorkouts = async () => {
-      try{
+      try {
         const response = await fetch(`/api/workout`);
-        if(!response.ok) throw new Error('Hiba a szerver elérésekor');
+        if (!response.ok) throw new Error("Hiba a szerver elérésekor");
         const data = await response.json();
-        console.log(data)
-        setWorkouts(data);
-      }catch(error){
-        console.error("Hiba:",error);
-      }finally{
+        console.log(data);
+        const loadedWorkouts = data.map((dto) => new Workout(dto));
+        setWorkouts(loadedWorkouts);
+      } catch (error) {
+        console.error("Hiba:", error);
+      } finally {
         setIsLoadingWorkout(false);
       }
     };
     loadWorkouts();
-}, []);
+  }, []);
 
   /**
    * Új edzés hozzáadása a listához.
    * @param {Object} workoutData - Az új edzés adatai
    */
-  const addWorkout = async (workoutData) => {
-    const newWorkout = {
-      date: new Date().toISOString().split('T')[0],      
-      ...workoutData
-    };
-    const workoutToSave = {
-    ...newWorkout,
-    exercises: newWorkout.exercises.map(({ id, ...rest }) => ({
-      ...rest, 
-      sets: rest.sets.map(({ id, ...setRest }) => setRest)
-    }))
-  };
-    try{
-      const response = await fetch(`/api/workout`,{
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify(workoutToSave)
+  const addWorkout = async (workoutToAdd) => {    
+    try {
+      const response = await fetch(`/api/workout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(workoutToAdd),
       });
-      if(response.ok){
+      if (response.ok) {
         const responseWorkout = await response.json();
-        setWorkouts((prevWorkouts) => [...prevWorkouts, responseWorkout]);
+        const addedWorkout = new Workout(responseWorkout)
+        setWorkouts((prevWorkouts) => [...prevWorkouts, addedWorkout]);
       }
-    }catch(error){
+    } catch (error) {
       console.error("Hiba a mentés során:", error);
-    }    
+    }
   };
 
   /**
@@ -64,32 +55,32 @@ export const WorkoutProvider = ({ children }) => {
    */
   //API hívás lesz
   const deleteWorkout = async (id) => {
-    try{
+    try {
       const response = await fetch(`/api/workout/${id}`, {
-        method: 'DELETE'
+        method: "DELETE",
       });
-      if(response.ok){
-        console.log("Sikeres törlés adatbázisból")
-      }else{
+      if (response.ok) {
+        console.log("Sikeres törlés adatbázisból");
+        setWorkouts((prevWorkouts) =>
+        prevWorkouts.filter((workout) => workout.id !== id),
+      );
+      } else {
         console.error("Hiba történt a szerveren. Státuszkód:", response.status);
-      }     
-      setWorkouts((prevWorkouts) => prevWorkouts.filter((workout) => workout.id !== id));      
-    }catch(error){
-        console.error("Hiba a törlés során",error)
-    }    
+      }      
+    } catch (error) {
+      console.error("Hiba a törlés során", error);
+    }
   };
 
   const value = {
     workouts,
     isLoadingWorkout,
     addWorkout,
-    deleteWorkout
+    deleteWorkout,
   };
 
   return (
-    <WorkoutContext.Provider value={value}>
-      {children}
-    </WorkoutContext.Provider>
+    <WorkoutContext.Provider value={value}>{children}</WorkoutContext.Provider>
   );
 };
 

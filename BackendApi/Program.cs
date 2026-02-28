@@ -38,15 +38,15 @@ using (var scope = app.Services.CreateScope())
         try
         {
             logger.LogInformation("Próbálkozás az adatbázis elérésére...");
-            context.Database.Migrate(); // Itt fogja létrehozni a FitnessDb-t és a Workouts táblát is!
+            await context.Database.MigrateAsync(); 
             logger.LogInformation("Siker! Az adatbázis készen áll.");
-            break; // Ha sikerült, kilépünk a ciklusból
+            break; 
         }
         catch (Exception ex)
         {
             retries--;
             logger.LogWarning($"Az SQL Server még nem áll készen. Újrapróbálkozás ({10 - retries}/10)...");
-            System.Threading.Thread.Sleep(5000); // Várjunk 5 másodpercet a következő próbáig
+            System.Threading.Thread.Sleep(5000); 
             
             if (retries == 0)
             {
@@ -67,4 +67,4 @@ app.MapControllers();
 
 app.UseCors("ReactPolicy"); // CORS bekapcsolása
 
-app.Run();
+await app.RunAsync();

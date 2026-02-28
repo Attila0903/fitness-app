@@ -7,144 +7,121 @@ import SaveIcon from '@mui/icons-material/Save';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import { v4 as uuidv4 } from 'uuid';
+
+// Modellek importálása
+import Workout from '../model/Workout';
+import Exercise from '../model/Exercise';
+// Feltételezem, hogy van egy WorkoutSet modelled is (vagy használd a megfelelőt)
+import WorkoutSet from '../model/WorkoutSet'; 
 import ExerciseForm from '../components/ExerciseForm';
 
-/**
- * Új Edzés Rögzítése Oldal (AddWorkout).
- * * Ez a komponens felelős az új edzések összeállításáért és mentéséért.
- * Két fő állapota van:
- * 1. Kezdőképernyő: Edzés nevének és dátumának megadása.
- * 2. Rögzítő képernyő: Gyakorlatok és szettek dinamikus felvétele.
- * * Kezelt funkciók:
- * - Űrlap validáció (kötelező mezők).
- * - Dinamikus lista kezelés (gyakorlatok/szettek hozzáadása és törlése).
- * - Kapcsolódás a Context API-hoz a mentéshez.
- */
 const AddWorkout = () => {
   const { addWorkout } = useWorkouts();
   const navigate = useNavigate();
 
-  // Állapotok
-  // isStarted: false = beállító nézet, true = gyakorlatok listája nézet
   const [isStarted, setIsStarted] = useState(false);
   
-  // Az edzés metaadatai (fejléc)
-  const [workoutMeta, setWorkoutMeta] = useState({
+  // EGYETLEN ÁLLAPOT: A teljes edzés egyetlen osztálypéldányban él
+  const [workout, setWorkout] = useState(new Workout({
     name: '',
-    date: new Date().toISOString().split('T')[0]
-  });
-
-  // A gyakorlatok listája
-  const [exercises, setExercises] = useState([]);
+    date: new Date(),
+    exercises: []
+  }));
 
   // --- KEZELŐ FÜGGVÉNYEK (HANDLERS) ---
 
-  /**
-   * Az "Indítás" gomb kezelője.
-   * Ellenőrzi, hogy van-e név megadva, majd átvált a részletes nézetre.
-   */
   const handleStartWorkout = (e) => {
     e.preventDefault();
-    if (workoutMeta.name.trim()) setIsStarted(true);
-    else alert("Adj nevet az edzésnek!");
+    // A logikát rábízzuk az osztályra!
+    if (workout.isNameValid()) {
+      setIsStarted(true);
+    } else {
+      alert("Kérlek, adj meg egy érvényes nevet az edzésnek (min. 3 karakter)!");
+    }
   };
 
-  /**
-   * Új, üres gyakorlat blokk hozzáadása a listához.
-   * Egyedi ID-t generál (UUID) a helyes React renderelés érdekében.
-   */
+  // Segédfüggvény az állapot frissítéséhez (DRY elv)
+  // Létrehoz egy másolatot az edzésből, hogy a React újrarendereljen
+  const updateWorkoutState = (updaterFn) => {
+    setWorkout(prev => {
+      const clonedWorkout = new Workout(prev); // Új példány (mély másolat)
+      updaterFn(clonedWorkout); // Módosítjuk a másolatot
+      return clonedWorkout; // Visszaadjuk a React-nek
+    });
+  };
+
   const handleAddExercise = () => {
-    setExercises([...exercises, { id: uuidv4(), name: '', sets: [] }]);
+    updateWorkoutState((w) => {
+      w.exercises.push(new Exercise({ id: uuidv4(), name: '', sets: [] }));
+    });
   };
 
-  /**
-   * Gyakorlat nevének frissítése.
-   * Megkeresi az adott ID-jú gyakorlatot és módosítja a nevét.
-   * @param {string} id - A gyakorlat azonosítója
-   * @param {string} newName - Az új név
-   */
   const handleExerciseNameChange = (id, newName) => {
-    setExercises(exercises.map(ex => ex.id === id ? { ...ex, name: newName } : ex));
+    updateWorkoutState((w) => {
+      const exercise = w.exercises.find(ex => ex.id === id);
+      if (exercise) exercise.name = newName;
+    });
   };
 
-  /**
-   * Teljes gyakorlat törlése (a benne lévő szettekkel együtt).
-   * @param {string} id - A törlendő gyakorlat azonosítója
-   */
   const handleDeleteExercise = (id) => {
-    setExercises(exercises.filter(ex => ex.id !== id));
+    updateWorkoutState((w) => {
+      w.exercises = w.exercises.filter(ex => ex.id !== id);
+    });
   };
 
-  /**
-   * Új szett hozzáadása egy adott gyakorlathoz.
-   * Beágyazott map-elést használ, hogy megtalálja a megfelelő gyakorlatot,
-   * majd bővíti annak 'sets' tömbjét.
-   * @param {string} exerciseId - Melyik gyakorlathoz adjuk?
-   */
   const handleAddSet = (exerciseId) => {
-    setExercises(exercises.map(ex => {
-      if (ex.id === exerciseId) {
-        return { ...ex, sets: [...ex.sets, { id: uuidv4(), weight: '', reps: '' }] };
+    updateWorkoutState((w) => {
+      const exercise = w.exercises.find(ex => ex.id === exerciseId);
+      if (exercise) {
+        exercise.sets.push(new WorkoutSet({ id: uuidv4(), weight: 0, reps: 0 }));
       }
-      return ex;
-    }));
+    });
   };
 
-  /**
-   * Egy konkrét szett adatainak (súly vagy ismétlés) módosítása.
-   * Mélyen beágyazott állapotfrissítést végez (Gyakorlat -> Szett -> Mező).
-   * * @param {string} exerciseId - A szülő gyakorlat ID-ja
-   * @param {string} setId - A módosítandó szett ID-ja
-   * @param {string} field - Melyik mező változik ('weight' vagy 'reps')
-   * @param {string} value - Az új érték
-   */
   const handleSetChange = (exerciseId, setId, field, value) => {
-    setExercises(exercises.map(ex => {
-      if (ex.id === exerciseId) {
-        const updatedSets = ex.sets.map(set => set.id === setId ? { ...set, [field]: value } : set);
-        return { ...ex, sets: updatedSets };
+    updateWorkoutState((w) => {
+      const exercise = w.exercises.find(ex => ex.id === exerciseId);
+      if (exercise) {
+        const set = exercise.sets.find(s => s.id === setId);
+        if (set) set[field] = value;
       }
-      return ex;
-    }));
+    });
   };
 
-  /**
-   * Egyetlen szett törlése a listából.
-   * @param {string} exerciseId - A gyakorlat ID-ja
-   * @param {string} setId - A törlendő szett ID-ja
-   */
   const handleSetDelete = (exerciseId, setId) => {
-    setExercises(exercises.map(ex => {
-      if (ex.id === exerciseId) {
-        return { ...ex, sets: ex.sets.filter(set => set.id !== setId) };
+    updateWorkoutState((w) => {
+      const exercise = w.exercises.find(ex => ex.id === exerciseId);
+      if (exercise) {
+        exercise.sets = exercise.sets.filter(s => s.id !== setId);
       }
-      return ex;
-    }));
+    });
   };
 
-  /**
-   * A teljes edzés mentése.
-   * 1. Kiszűri az üres/érvénytelen gyakorlatokat.
-   * 2. Ellenőrzi, hogy maradt-e valid adat.
-   * 3. Meghívja a Context 'addWorkout' függvényét.
-   * 4. Visszanavigál a főoldalra.
-   */
   const handleSaveWorkout = () => {
-    const validExercises = exercises.filter(ex => ex.name.trim() !== '' && ex.sets.length > 0);
-    
-    if (validExercises.length === 0) {
+    // Kiszűrjük az üres gyakorlatokat egy új, mentésre szánt példányban
+    const workoutToSave = new Workout(workout);
+    workoutToSave.exercises = workoutToSave.exercises.filter(
+      ex => ex.name.trim() !== '' && ex.sets.length > 0
+    );
+
+    if (workoutToSave.exercises.length === 0) {
       alert("Rögzíts legalább egy gyakorlatot és egy szettet!");
       return;
     }
     
-    addWorkout({ ...workoutMeta, exercises: validExercises });
+    // Ha van toSaveDto metódusod, hívd meg, amúgy mehet az objektum!
+    addWorkout(workoutToSave.dtoFormat());
     navigate('/');
+  };
+
+  const getInputValueForDate = () => {
+      const d = workout.date;
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   };
 
   // --- MEGJELENÍTÉS (RENDER) ---
 
-  // 1. Nézet: Kezdőképernyő (ha még nincs elindítva)
-  if (!isStarted) {
+ if (!isStarted) {
     return (
       <Container maxWidth="sm" sx={{ mt: 8 }}>
         <Paper elevation={3} sx={{ p: 4, textAlign: 'center' }}>
@@ -155,8 +132,8 @@ const AddWorkout = () => {
               label="Edzés neve"
               fullWidth
               required
-              value={workoutMeta.name}
-              onChange={(e) => setWorkoutMeta({...workoutMeta, name: e.target.value})}
+              value={workout.name}
+              onChange={(e) => updateWorkoutState(w => w.name = e.target.value)}
               sx={{ mb: 3 }}
               placeholder="pl. Hát-Bicepsz"
             />
@@ -165,8 +142,8 @@ const AddWorkout = () => {
               type="date"
               fullWidth
               required
-              value={workoutMeta.date}
-              onChange={(e) => setWorkoutMeta({...workoutMeta, date: e.target.value})}
+              value={getInputValueForDate()}
+              onChange={(e) => updateWorkoutState(w => w.date = new Date(e.target.value))}
               sx={{ mb: 4 }}
             />
             <Button variant="contained" onClick={handleStartWorkout} size="large" fullWidth startIcon={<PlayArrowIcon />}>
@@ -178,20 +155,20 @@ const AddWorkout = () => {
     );
   }
 
-  // 2. Nézet: Gyakorlatok listája és rögzítése
   return (
     <Container maxWidth="md" sx={{ py: 4 }}>
       <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
         <div>
-          <Typography variant="h4">{workoutMeta.name}</Typography>
-          <Typography variant="subtitle1" color="textSecondary">{workoutMeta.date}</Typography>
+          <Typography variant="h4">{workout.name}</Typography>
+          <Typography variant="subtitle1" color="textSecondary">{getInputValueForDate()}</Typography>
         </div>
         <Button variant="contained" color="success" startIcon={<SaveIcon />} onClick={handleSaveWorkout}>
           Edzés Mentése
         </Button>
       </Box>
 
-      {exercises.map((exercise, index) => (
+      {/* Itt már a workout.exercises tömbön iterálunk végig! */}
+      {workout.exercises.map((exercise, index) => (
         <ExerciseForm 
           key={exercise.id}
           exercise={exercise}
