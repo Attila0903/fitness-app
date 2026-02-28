@@ -8,11 +8,11 @@ import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 import { v4 as uuidv4 } from 'uuid';
 
-// Modellek importálása
-import Workout from '../model/Workout';
-import Exercise from '../model/Exercise';
-// Feltételezem, hogy van egy WorkoutSet modelled is (vagy használd a megfelelőt)
-import WorkoutSet from '../model/WorkoutSet'; 
+
+import {Workout} from '../model/Workout';
+import {Exercise} from '../model/Exercise';
+
+import {WorkoutSet} from '../model/WorkoutSet'; 
 import ExerciseForm from '../components/ExerciseForm';
 
 const AddWorkout = () => {

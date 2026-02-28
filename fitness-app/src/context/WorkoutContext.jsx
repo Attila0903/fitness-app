@@ -1,5 +1,5 @@
 import React, { createContext, useState, useEffect, useContext } from "react";
-import { Workout } from "./models/Workout";
+import {Workout}  from "./model/Workout";
 
 const WorkoutContext = createContext();
 
