@@ -28,7 +28,7 @@ const WorkoutCard = ({ workout, onDelete }) => {
         
         {/*Dátum*/}
         <Typography variant="body2" color="textSecondary" sx={{ mb: 2, ml: 4 }}>
-          {workout.date}
+          {workout.date.toLocaleDateString('hu-HU')}
         </Typography>
         
         <Divider sx={{ mb: 2 }} />
