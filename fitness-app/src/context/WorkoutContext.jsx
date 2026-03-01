@@ -37,7 +37,7 @@ export const WorkoutProvider = ({ children }) => {
       const response = await fetch(`/api/workout`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(workoutToAdd.dtoFormat()),
+        body: JSON.stringify(workoutToAdd),
       });
       if (response.ok) {
         const responseWorkout = await response.json();
