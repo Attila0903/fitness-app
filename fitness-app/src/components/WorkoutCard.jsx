@@ -2,14 +2,14 @@ import React from 'react';
 import { Card, CardContent, Box, Typography, IconButton, Divider, Chip } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EventIcon from '@mui/icons-material/Event';
+// 1. Importáljuk a Workout osztályt
+import { Workout } from '../model/Workout';
 
 /**
  * WorkoutCard Komponens
- * * Ez a komponens felelős egyetlen edzés adatainak kártyaszerű megjelenítéséért a főoldalon.
- * Megjeleníti az edzés nevét, dátumát, és a hozzá tartozó gyakorlatokat címkék (Chip) formájában.
  * * @param {Object} props - A komponens bemeneti tulajdonságai
- * @param {Object} props.workout - Az edzés objektum (tartalmazza: id, name, date, exercises)
- * @param {Function} props.onDelete - Callback függvény, ami az edzés törlésekor hívódik meg az ID-val
+ * @param {Workout} props.workout - Az edzés objektum a modell alapján
+ * @param {Function} props.onDelete - Callback függvény az edzés törlésekor
  */
 const WorkoutCard = ({ workout, onDelete }) => {
   return (
@@ -19,6 +19,7 @@ const WorkoutCard = ({ workout, onDelete }) => {
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
           <Box display="flex" alignItems="center" gap={1}>
             <EventIcon color="action" />
+            {/* Az IDE most már tudja, hogy a workout.name egy string */}
             <Typography variant="h6">{workout.name}</Typography>
           </Box>
           <IconButton onClick={() => onDelete(workout.id)} color="error">
@@ -26,7 +27,7 @@ const WorkoutCard = ({ workout, onDelete }) => {
           </IconButton>
         </Box>
         
-        {/*Dátum*/}
+        {/*Dátum - Itt kritikus, hogy a modell példányosítva legyen, így a date egy Date objektum*/}
         <Typography variant="body2" color="textSecondary" sx={{ mb: 2, ml: 4 }}>
           {workout.date.toLocaleDateString('hu-HU')}
         </Typography>

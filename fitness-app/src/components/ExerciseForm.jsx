@@ -12,18 +12,14 @@ import {
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import SetRow from "./SetRow";
+// 1. Importáljuk az Exercise osztályt
+import { Exercise } from "../model/Exercise";
 
 /**
  * ExerciseForm (Gyakorlat Űrlap) Komponens.
- * * Ez a komponens egyetlen gyakorlat szerkesztőfelületét jeleníti meg kártya formájában.
- * * Felépítése:
- * - Fejléc: Sorszám, Gyakorlat neve (input), Törlés gomb.
- * - Törzs: A szettek listája (`SetRow` komponensek).
- * - Lábléc: "Szett hozzáadása" gomb. 
- *
- * @param {Object} props - A komponens tulajdonságai
- * @param {Object} props.exercise - A gyakorlat objektum (tartalmazza: id, name, sets tömb)
- * @param {number} props.index - A gyakorlat sorszáma a listában (0-tól indul, ezért adunk hozzá 1-et a megjelenítésnél)
+ * * @param {Object} props - A komponens tulajdonságai
+ * @param {Exercise} props.exercise - A gyakorlat objektum a modell alapján
+ * @param {number} props.index - A gyakorlat sorszáma a listában
  * @param {Function} props.onNameChange - Callback a gyakorlat nevének módosításakor
  * @param {Function} props.onDelete - Callback a teljes gyakorlat törlésekor
  * @param {Function} props.onAddSet - Callback új szett hozzáadásakor
@@ -62,7 +58,6 @@ const ExerciseForm = ({
         <Divider sx={{ mb: 2 }} />
 
         {/* --- Szettek listázása --- */}
-        {/* Minden egyes szett objektumhoz létrehozunk egy SetRow komponenst */}
         {exercise.sets.map((set, setIndex) => (
           <SetRow
             key={set.id}

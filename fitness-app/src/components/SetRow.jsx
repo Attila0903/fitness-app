@@ -1,15 +1,14 @@
 import React from 'react';
 import { Box, Typography, TextField, IconButton } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
+// 1. Importáljuk az ExerciseSet osztályt
+import { ExerciseSet } from '../model/ExerciseSet';
 
 /**
  * SetRow (Szett) Komponens.
- * * Ez a komponens egyetlen szett beviteli mezőit (súly, ismétlés) jeleníti meg.
- * * Működése:
- * - A beírt adatokat azonnal továbbítja a szülő (`ExerciseForm`) felé az `onChange` callback-en keresztül.
- * - Tartalmaz egy törlés gombot az adott sor eltávolítására.
+ * Ez a komponens egyetlen szett beviteli mezőit (súly, ismétlés) jeleníti meg.
  * * @param {Object} props - A komponens bemeneti tulajdonságai
- * @param {Object} props.set - A szett adatobjektuma (id, weight, reps)
+ * @param {ExerciseSet} props.set - A szett adatobjektuma a modell alapján
  * @param {number} props.index - A szett sorszáma (0-tól indul, megjelenítésnél +1)
  * @param {Function} props.onChange - Callback függvény az adatváltozás jelzésére (id, field, value)
  * @param {Function} props.onDelete - Callback függvény a szett törlésére (id)
