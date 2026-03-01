@@ -12,7 +12,7 @@ import { v4 as uuidv4 } from 'uuid';
 import {Workout} from '../model/Workout';
 import {Exercise} from '../model/Exercise';
 
-import {WorkoutSet} from '../model/WorkoutSet'; 
+import {ExerciseSet} from '../model/ExerciseSet'; 
 import ExerciseForm from '../components/ExerciseForm';
 
 const AddWorkout = () => {
@@ -73,7 +73,7 @@ const AddWorkout = () => {
     updateWorkoutState((w) => {
       const exercise = w.exercises.find(ex => ex.id === exerciseId);
       if (exercise) {
-        exercise.sets.push(new WorkoutSet({ id: uuidv4(), weight: 0, reps: 0 }));
+        exercise.sets.push(new ExerciseSet({ id: uuidv4(), weight: 0, reps: 0 }));
       }
     });
   };
