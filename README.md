@@ -57,6 +57,7 @@ A projekt futtatásához mindössze a [Docker Desktop](https://www.docker.com/pr
    cd fitness-app
 
 2. Indítsd el a konténereket a Docker Compose segítségével:
+   ```bash
    docker-compose up -d
 
 3. Nyisd meg a böngészőt!
