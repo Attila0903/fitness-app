@@ -30,16 +30,16 @@ A projekt modern iparági sztenderdek (Clean Architecture, RESTful API, Konténe
 
 ## 📸 Képernyőképek
 
-* **Kezdőképernyő / Napló:** ![alt text](image.png)
-* **Új edzés felvitele:** ![alt text](image-1.png)
-* **Statisztika és grafikonok:** ![alt text](image-2.png)
+* **Kezdőképernyő / Napló:** ![Diary](snapshots/diary.png)
+* **Új edzés felvitele:** ![New Workout](snapshots/newworkout.png)
+* **Statisztika és grafikonok:** ![Graph](snapshots/graph.png)
 
 ---
 
 ## 🏗️ Adatbázis Struktúra (Osztálydiagram)
 
 Az alkalmazás egy relációs adatszerkezetre épül:
-![alt text](datastructure.png)
+![Data structure](snapshots/datastructure.png)
 
 * **Workout (Edzés):** Tartalmazza a dátumot és az edzés nevét.
 * **Exercise (Gyakorlat):** Egy edzéshez több gyakorlat is tartozik.
