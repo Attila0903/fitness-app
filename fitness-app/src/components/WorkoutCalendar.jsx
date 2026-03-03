@@ -43,7 +43,7 @@ function WorkoutDay(props) {
  * @param {Array} props.workouts - Az edzések tömbje
  */
 const WorkoutCalendar = ({ workouts }) => {  
-  const workoutDates = useMemo(() => workouts.map(w => w.date), [workouts]);
+  const workoutDates = useMemo(() => workouts.map(w => w.getFormattedDate()), [workouts]);
 
   return (
     <Paper elevation={3} sx={{ p: 2, display: 'flex', justifyContent: 'center', height: '100%' }}>

@@ -13,7 +13,7 @@ export const WorkoutProvider = ({ children }) => {
   useEffect(() => {
     const loadWorkouts = async () => {
       try {
-        const response = await fetch(`/api/workout`);
+        const response = await fetch(`/api/workouts`);
         if (!response.ok) throw new Error("Hiba a szerver elérésekor");
         const data = await response.json();
         console.log(data);
@@ -34,7 +34,7 @@ export const WorkoutProvider = ({ children }) => {
    */
   const addWorkout = async (workoutToAdd) => {    
     try {
-      const response = await fetch(`/api/workout`, {
+      const response = await fetch(`/api/workouts`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(workoutToAdd),
@@ -56,7 +56,7 @@ export const WorkoutProvider = ({ children }) => {
   //API hívás lesz
   const deleteWorkout = async (id) => {
     try {
-      const response = await fetch(`/api/workout/${id}`, {
+      const response = await fetch(`/api/workouts/${id}`, {
         method: "DELETE",
       });
       if (response.ok) {

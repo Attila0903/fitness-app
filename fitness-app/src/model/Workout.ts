@@ -20,9 +20,14 @@ export class Workout{
         this.exercises = dto.exercises? dto.exercises.map(e =>new Exercise(e)) : [];
     }
 
+    //Dátum visszaadása "YYYY-MM-DD" formátumban
+    getFormattedDate(): string{
+        return `${this.date.getFullYear()}-${String(this.date.getMonth() + 1).padStart(2, '0')}-${String(this.date.getDate()).padStart(2, '0')}`;
+    }
+
     dtoFormat(){
         return {
-            date: `${this.date.getFullYear()}-${String(this.date.getMonth() + 1).padStart(2, '0')}-${String(this.date.getDate()).padStart(2, '0')}`,
+            date: this.getFormattedDate(),
             name:this.name,
             exercises: this.exercises.map(ex => ex.dtoFormat())
         }

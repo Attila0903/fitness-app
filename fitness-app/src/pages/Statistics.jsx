@@ -58,7 +58,7 @@ const Statistics = () => {
       if (exercise && Array.isArray(exercise.sets)) {
         const maxWeight = Math.max(...exercise.sets.map(s => Number(s.weight) || 0));
         if (maxWeight > 0) {
-          data.push({ date: workout.date, weight: maxWeight });
+          data.push({ date: workout.getFormattedDate(), weight: maxWeight });
         }
       }
     });
