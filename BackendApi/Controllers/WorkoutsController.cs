@@ -6,79 +6,61 @@ using Microsoft.EntityFrameworkCore;
 [ApiController]
 public class WorkoutsController : ControllerBase
 {
-    private readonly FitnessDbContext _context;
+    private readonly IWorkoutService service;
 
-    public WorkoutsController(FitnessDbContext context)
+    public WorkoutsController(IWorkoutService serv)
     {
-        _context = context;
+        service = serv;
     }
 
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Workout>>> GetWorkouts()
+    public async Task<ActionResult<IEnumerable<WorkoutDto>>> GetWorkouts()
     {
-        var workouts = await _context.Workouts.Include(w => w.Exercises).ThenInclude(e => e.Sets).Select(
-            w => new WorkoutDto
-            {
-                Id = w.Id,
-                Date = w.Date,
-                Name = w.Name,
-                Exercises = w.Exercises.Select(e => new ExerciseDto
-                {
-                    Id = e.Id,
-                    Name = e.Name,
-                    Sets = e.Sets.Select(s => new SetDto
-                    {
-                        Id = s.Id,
-                        Reps = s.Reps,
-                        Weight = s.Weight
-                    }).ToList()
-                }).ToList()
-            }
-        ).ToListAsync();
-
-        return Ok(workouts);
+        var workoutDtos = await service.GetWorkouts();
+        
+        return Ok(workoutDtos);           
     }
 
     [HttpPost]
-    public async Task<ActionResult<Workout>> AddWorkout(WorkoutDto workoutDto)
+    public async Task<ActionResult<WorkoutDto>> AddWorkout(WorkoutDto dto)
     {
-        var workout = new Workout
+        try
         {
-            Date = workoutDto.Date,
-            Name = workoutDto.Name,
-            Exercises = workoutDto.Exercises.Select(e => new Exercise
-            {
-                Name = e.Name,
-                Sets = e.Sets.Select(s => new Set
-                {
-                    Reps = s.Reps,
-                    Weight= s.Weight
-                }).ToList()
-            }).ToList()
-        };      
-        _context.Workouts.Add(workout);
-        //ID legener√°l√≥dik
-        await _context.SaveChangesAsync();
-        //Dto-nak be√°ll√≠tjuk az Id-t
-        workoutDto.Id = workout.Id;
-        //Visszak√ºldj√ºk a Dto-t
-        return Ok(workoutDto);
+            var addedWorkout = await service.AddWorkout(dto);
+            return CreatedAtAction(nameof(GetWorkoutById), new { id = addedWorkout.Id }, addedWorkout);
+        }
+        catch (DbUpdateException e)
+        {
+            return StatusCode(500, "V·ratlan hiba tˆrtÈnt a mentÈs sor·n.");
+        }
+        catch (Exception e) { 
+            return Conflict(e.Message);
+        }
     }
 
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteWorkout([FromRoute] int id)
     {
-        var deletedWorkout = await _context.Workouts.Include(w => w.Exercises).ThenInclude(e => e.Sets).Where(w => w.Id == id).FirstOrDefaultAsync();
+        try{
+            var deletedWorkout = await service.DeleteWorkout(id);
+            if (deletedWorkout == null) return NotFound();
+            return NoContent();
+        }catch(DbUpdateException e)
+        {   
+            return Conflict(e.Message);
+        }        
+    }
 
-        if (deletedWorkout == null)
+    [HttpGet("{id}")]
+    public async Task<ActionResult<WorkoutDto>> GetWorkoutById(int id)
+    {
+        var workout = await service.GetWorkoutById(id);
+
+        if (workout == null)
         {
             return NotFound();
         }
 
-        _context.Workouts.Remove(deletedWorkout);
-
-        await _context.SaveChangesAsync();
-
-        return NoContent();
+        return Ok(workout);
     }
 }

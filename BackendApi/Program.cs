@@ -14,11 +14,15 @@ builder.Services.AddCors( options =>
 }
 );
 
-builder.Services.AddControllers();
-
 builder.Services.AddDbContext<FitnessDbContext>(options => 
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 );
+
+builder.Services.AddScoped<IWorkoutRepository, WorkoutRepository>();
+
+builder.Services.AddScoped<IWorkoutService, WorkoutService>();
+
+builder.Services.AddControllers();
 
 // Add services to the container.
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi

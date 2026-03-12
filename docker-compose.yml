@@ -9,7 +9,7 @@ services:
 
   backend:
     build:
-      context: ./BackendApi  # Ez azt mondja, hogy a Docker csak a BackendApi mappát lássa
+      context: ./BackendApi  
       dockerfile: Dockerfile
     environment:
       - ConnectionStrings__DefaultConnection=Server=db;Database=FitnessDb;User Id=sa;Password=YourStrong!Pass123;TrustServerCertificate=True

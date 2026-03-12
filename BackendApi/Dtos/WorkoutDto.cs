@@ -1,7 +1,13 @@
+using System.ComponentModel.DataAnnotations;
+
 public class WorkoutDto
 {
     public int Id {get;set;}
-    public DateOnly Date {get;set;}    
+    [Required]
+    public DateOnly Date {get;set;}
+    [Required]
     public string? Name {get;set;}
-    public List<ExerciseDto> Exercises {get;set;} = [];
+    [Required]
+    [MinLength(1, ErrorMessage = "Legalább egy gyakorlat kell")]
+    public List<ExerciseDto>? Exercises {get;set;}
 }
