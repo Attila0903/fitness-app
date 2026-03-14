@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useWorkouts } from '../context/WorkoutContext';
 import { useNavigate } from 'react-router-dom';
-import { Container, TextField, Button, Typography, Box, Paper } from '@mui/material';
+import { Container, TextField, Button, Typography, Box, Paper, Dialog, DialogTitle, DialogContent, DialogContentText, DialogActions } from '@mui/material';
 import AddCircleOutlineIcon from '@mui/icons-material/AddCircleOutline';
 import SaveIcon from '@mui/icons-material/Save';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
@@ -20,6 +20,9 @@ const AddWorkout = () => {
   const navigate = useNavigate();
 
   const [isStarted, setIsStarted] = useState(false);
+
+  const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [savedVolume, setSavedVolume] = useState(0);
   
   // EGYETLEN ÁLLAPOT: A teljes edzés egyetlen osztálypéldányban él
   const [workout, setWorkout] = useState(new Workout({
@@ -97,7 +100,7 @@ const AddWorkout = () => {
     });
   };
 
-  const handleSaveWorkout = () => {
+  const handleSaveWorkout = async () => {
     // Kiszűrjük az üres gyakorlatokat egy új, mentésre szánt példányban
     const workoutToSave = new Workout(workout);
     workoutToSave.exercises = workoutToSave.exercises.filter(
@@ -108,9 +111,21 @@ const AddWorkout = () => {
       alert("Rögzíts legalább egy gyakorlatot és egy szettet!");
       return;
     }
-    
-    // Ha van toSaveDto metódusod, hívd meg, amúgy mehet az objektum!
-    addWorkout(workoutToSave.dtoFormat());
+
+    const result = await addWorkout(workoutToSave.dtoFormat());
+
+    if (result.success) {
+      // Sikeres mentés esetén kinyerjük a Volume-ot és kinyitjuk a Dialogot
+      setSavedVolume(result.data.totalVolume);
+      setSuccessDialogOpen(true);
+    } else {
+      // Itt továbbra is kezelheted a hiba ablakot, amit előzőleg csináltunk
+      alert(result.message);
+    }   
+  };
+
+  const handleCloseSuccessDialog = () => {
+    setSuccessDialogOpen(false);
     navigate('/');
   };
 
@@ -187,6 +202,22 @@ const AddWorkout = () => {
       >
         Új Gyakorlat Felvétele
       </Button>
+
+      <Dialog open={successDialogOpen} onClose={handleCloseSuccessDialog}>
+        <DialogTitle sx={{ color: 'success.main', fontWeight: 'bold' }}>
+          Sikeres edzés! 🎉
+        </DialogTitle>
+        <DialogContent>
+          <DialogContentText sx={{ fontSize: '1.1rem' }}>
+            Szép munka volt a mai! Ezen az edzésen összesen <strong>{savedVolume} kg</strong>-ot mozgattál meg.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseSuccessDialog} color="success" variant="contained">
+            Irány a főoldal!
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 };

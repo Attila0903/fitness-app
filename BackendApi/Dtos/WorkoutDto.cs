@@ -7,7 +7,8 @@ public class WorkoutDto
     public DateOnly Date {get;set;}
     [Required]
     public string? Name {get;set;}
+    public double TotalVolume{get;set;}
     [Required]
-    [MinLength(1, ErrorMessage = "Legalább egy gyakorlat kell")]
+    [MinLength(1, ErrorMessage = "Legalï¿½bb egy gyakorlat kell")]
     public List<ExerciseDto>? Exercises {get;set;}
 }

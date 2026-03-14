@@ -43,9 +43,13 @@ export const WorkoutProvider = ({ children }) => {
         const responseWorkout = await response.json();
         const addedWorkout = new Workout(responseWorkout)
         setWorkouts((prevWorkouts) => [...prevWorkouts, addedWorkout]);
+        return { success: true, data: addedWorkout };
+      }else{
+        return { success: false, message: "Hiba a mentés során." };
       }
     } catch (error) {
       console.error("Hiba a mentés során:", error);
+      return { success: false, message: "Hálózati hiba." };
     }
   };
 

@@ -9,17 +9,17 @@ public class WorkoutService : IWorkoutService
         repository = repo;
     }
     public async Task<WorkoutDto> AddWorkout(WorkoutDto dto)
-    {       
-        var workoutWithSameDate = await repository.GetWorkoutByDate(dto.Date);
-        if (workoutWithSameDate != null)
+    {   
+        var addedWorkout = await repository.AddWorkout(dto.ToWorkout());
+        var workoutDto = addedWorkout.ToDto();
+        if(dto.Exercises != null)
         {
-            throw new Exception($"Már létezik edzés a megadott dátummal: {dto.Date}");
+            workoutDto.TotalVolume = dto.Exercises
+                .SelectMany(e => e.Sets == null ? new List<SetDto>() : e.Sets)
+                .Sum(s => s.Weight * s.Reps);
         }
 
-        var addedWorkout = await repository.AddWorkout(dto.ToWorkout());
-        //Itt ha a dto ki lenne bővítve más tulajdonságokkal, a paraméterben
-        //lévő dto-val kellene kibővíteni a visszakapott Workout tulajdonságait
-        return addedWorkout.ToDto();
+        return workoutDto;
     }
 
     public async Task<WorkoutDto?> DeleteWorkout(int id)

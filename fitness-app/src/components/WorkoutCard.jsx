@@ -4,6 +4,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import EventIcon from '@mui/icons-material/Event';
 // 1. Importáljuk a Workout osztályt
 import { Workout } from '../model/Workout';
+import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
 
 /**
  * WorkoutCard Komponens
@@ -27,10 +28,22 @@ const WorkoutCard = ({ workout, onDelete }) => {
           </IconButton>
         </Box>
         
-        {/*Dátum - Itt kritikus, hogy a modell példányosítva legyen, így a date egy Date objektum*/}
-        <Typography variant="body2" color="textSecondary" sx={{ mb: 2, ml: 4 }}>
-          {workout.date.toLocaleDateString('hu-HU')}
-        </Typography>
+        <Box sx={{ ml: 4, mb: 2 }}>
+          <Typography variant="body2" color="textSecondary" sx={{ mb: 1 }}>
+            {workout.date.toLocaleDateString('hu-HU')}
+          </Typography>
+
+         
+          {workout.totalVolume > 0 && (
+            <Chip 
+              icon={<FitnessCenterIcon />} 
+              label={`Összterhelés: ${workout.totalVolume} kg`} 
+              size="small"
+              color="primary"
+              variant="outlined"
+            />
+          )}
+        </Box>
         
         <Divider sx={{ mb: 2 }} />
 
